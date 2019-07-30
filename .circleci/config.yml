@@ -2,7 +2,7 @@ version: 2
 jobs:
   mongotest:
     docker:
-      - image: mongo/3.6
+      - image: mongo:3.6
       - image: circleci/mongo@sha256:9f445565981189224ed6cbe122f8085b51d9b0d69b3d3b3010dfab4236848721
         environment:
           - MONGO_INITDB_ROOT_USERNAME=root-test
