@@ -1,0 +1,17 @@
+version: 2.1
+
+workflows:
+  test-workflow:
+    jobs:
+     - test-job
+
+jobs:
+  test-job:
+    step:
+      - run:
+         name: Running test something
+         command: |
+           echo "hello world"
+
+
+
