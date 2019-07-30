@@ -7,15 +7,11 @@ workflows:
 
 jobs:
   test-job:
-    step:
+    docker: true
+    steps:
       - run:
          name: Running test something
          command: |
            echo "hello world"           
-      - run:
-         name: Running test something
-         command: |
-           echo "hello world"
-
 
 
