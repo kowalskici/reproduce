@@ -3,15 +3,16 @@ version: 2.1
 workflows:
   test-workflow:
     jobs:
-     - test-job
+      - test-job
 
 jobs:
   test-job:
-    docker: true
+    docker:
+      - image: buildpack-deps:trusty
     steps:
       - run:
-         name: Running test something
-         command: |
-           echo "hello world"           
+          name: Running test something
+          command: |
+            echo "hello world"
 
 
