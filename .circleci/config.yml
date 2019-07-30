@@ -1,14 +1,8 @@
 version: 2.1
-
-workflows:
-  test-workflow:
-    jobs:
-      - test-job
-
 jobs:
-  test-job:
+  mongotest:
     docker:
-      - image: buildpack-deps:trusty
+      - image: circleci/python:3.7
       - image: circleci/mongo@sha256:9f445565981189224ed6cbe122f8085b51d9b0d69b3d3b3010dfab4236848721
         environment:
           - MONGO_INITDB_ROOT_USERNAME=root-test
@@ -17,8 +11,26 @@ jobs:
           - MONGODB_PASS=pass-test
     steps:
       - run:
-          name: Running test something
-          command: |
-            echo "hello world"
-
-
+          name: Run tests on mongo
+          command: "pipenv --python 3.7\npipenv run pip install pymongo\ncat << EOF\
+          \ > test.py\nfrom pymongo import MongoClient\nfrom random import randint\n\
+          from pprint import pprint\nclient = MongoClient(\"mongodb://root-test:pass-test@localhost:27017\"\
+          )\ndb=client.admin\n# Issue the serverStatus command and print the results\n\
+          serverStatusResult=db.command(\"serverStatus\")\npprint(serverStatusResult)\n\
+          \ndb=client.business\n# Test inserting sample data\nnames = ['Kitchen','Animal','State',\
+          \ 'Tastey', 'Big','City','Fish', 'Pizza','Goat', 'Salty','Sandwich','Lazy',\
+          \ 'Fun']\ncompany_type = ['LLC','Inc','Company','Corporation']\ncompany_cuisine\
+          \ = ['Pizza', 'Bar Food', 'Fast Food', 'Italian', 'Mexican', 'American',\
+          \ 'Sushi Bar', 'Vegetarian']\nfor x in range(1, 501):\n    business = {\n\
+          \        'name' : names[randint(0, (len(names)-1))] + ' ' + names[randint(0,\
+          \ (len(names)-1))]  + ' ' + company_type[randint(0, (len(company_type)-1))],\n\
+          \        'rating' : randint(1, 5),\n        'cuisine' : company_cuisine[randint(0,\
+          \ (len(company_cuisine)-1))] \n    }\n    result=db.reviews.insert_one(business)\n\
+          \    print('Created {0} of 500 as {1}'.format(x,result.inserted_id))\nprint('finished\
+          \ creating 500 business reviews')\nEOF\nchmod +x test.py\npipenv run python\
+          \ test.py\n"
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - mongotest
